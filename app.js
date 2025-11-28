@@ -85,8 +85,8 @@ async function loadAllCharacters() {
 }
 
 function searchCharacters() {
-  const input = document.getElementById("search");
-  const text = input.value.trim().toLowerCase();
+ const input = document.getElementById("searchInput");
+ const text = input.value.trim().toLowerCase();
 
   if (!text) {
     renderCharacters(allCharacters);
@@ -123,5 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.key === "Enter") searchCharacters();
     });
 });
+
 
 
