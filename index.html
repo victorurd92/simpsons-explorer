@@ -4,16 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Simpsons Explorer</title>
-  <link rel="stylesheet" href="estilos.css" />
+
+ 
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="container">
     <h1>🍩 The Simpsons Explorer</h1>
 
+  
     <div class="search-bar">
       <input
         type="text"
-        id="search"
+        id="searchInput"
         placeholder="Buscar personajes..."
       />
       <button id="btnSearch">Buscar</button>
@@ -21,12 +24,12 @@
       <button id="btnAll">Ver Todos</button>
     </div>
 
-    <div id="characters" class="grid">
-   
-    </div>
+    <div id="cardsContainer" class="grid"></div>
   </div>
 
-  <script src="aplicación.js"></script>
+ 
+  <script src="app.js" defer></script>
 </body>
 </html>
+
 
