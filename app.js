@@ -1,5 +1,8 @@
-const API_BASE = "https://thesimpsonsapi.com";
+const API_BASE = "https://thesimpsonsapi.com/api";
+const CDN_BASE = "https://cdn.thesimpsonsapi.com/500";
+
 let allCharacters = [];
+
 
 function renderCharacters(list) {
   const container = document.getElementById("cardsContainer");
@@ -27,16 +30,17 @@ function renderCharacters(list) {
 
 async function loadAllCharacters(page = 1) {
   try {
-    const res = await fetch(`${API_BASE}/api/characters?page=${page}`);
+    const res = await fetch(`${API_BASE}/characters?page=${page}`);
     const data = await res.json();
 
-  
+    
     allCharacters = data.results.map((item) => ({
       name: item.name,
-      image: `${API_BASE}${item.portrait_path}`,   
-      quote: item.phrases && item.phrases.length > 0
-        ? item.phrases[0]
-        : "Sin frase registrada."
+      image: `${CDN_BASE}${item.portrait_path}`, 
+      quote:
+        item.phrases && item.phrases.length > 0
+          ? item.phrases[0]
+          : "Sin frase registrada."
     }));
 
     renderCharacters(allCharacters);
@@ -77,12 +81,15 @@ function showRandom() {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadAllCharacters(); 
 
+  loadAllCharacters();
+
+ 
   document.getElementById("btnSearch").onclick = searchCharacters;
   document.getElementById("btnRandom").onclick = showRandom;
   document.getElementById("btnAll").onclick = () =>
     renderCharacters(allCharacters);
+
 
   document
     .getElementById("searchInput")
