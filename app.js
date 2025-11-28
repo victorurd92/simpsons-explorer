@@ -1,30 +1,50 @@
 const API_URL = "https://thesimpsonsapi.com/api/characters";
-const IMAGE_BASE = "https://cdn.thesimpsonsapi.com";
-
 
 let allCharacters = [];
 
 
-function displayCharacters(characters) {
-  const container = document.getElementById("characters");
 
-  if (!characters || characters.length === 0) {
-    container.innerHTML = `<p class="loading">No se encontraron personajes 😢</p>`;
+function buildImageUrl(character) {
+  if (!character.portrait_path) {
+    return "https://via.placeholder.com/250x250/ffd166/000000?text=Sin+imagen";
+  }
+
+  return `https://thesimpsonsapi.com${character.portrait_path}`;
+}
+
+function showMessage(msg) {
+  const container = document.getElementById("cardsContainer");
+  if (!container) return;
+  container.innerHTML = `<p class="loading">${msg}</p>`;
+}
+
+function renderCharacters(list) {
+  const container = document.getElementById("cardsContainer");
+  if (!container) return;
+
+  if (!list || list.length === 0) {
+    container.innerHTML =
+      '<p class="loading">No se encontraron personajes 😢</p>';
     return;
   }
 
-  container.innerHTML = characters
+  container.innerHTML = list
     .map((c) => {
-      const imgUrl = c.portrait_path
-        ? `${IMAGE_BASE}${c.portrait_path}`
-        : "https://via.placeholder.com/260x260/ffd166/000000?text=Sin+imagen";
-
+      const imgUrl = buildImageUrl(c);
       return `
         <div class="card">
-          <img src="${imgUrl}" alt="${c.name}"
-               onerror="this.src='https://via.placeholder.com/260x260/ffd166/000000?text=Sin+imagen'"/>
-          <h3>${c.name}</h3>
-          <p>${c.occupation || "Ocupación desconocida"}</p>
+          <div class="card-header">${c.name}</div>
+          <div class="card-image">
+            <img 
+              src="${imgUrl}" 
+              alt="${c.name}"
+              onerror="this.src='https://via.placeholder.com/250x250/ffd166/000000?text=Sin+imagen';"
+            >
+          </div>
+          <div class="card-body">
+            <p class="occupation">${c.occupation || "Sin ocupación"}</p>
+            <p class="status">${c.status || ""}</p>
+          </div>
         </div>
       `;
     })
@@ -32,61 +52,86 @@ function displayCharacters(characters) {
 }
 
 
-async function loadAllCharacters() {
-  const container = document.getElementById("characters");
-  container.innerHTML = `<p class="loading">Cargando personajes... 🔄</p>`;
 
+async function loadCharacters() {
   try {
+    showMessage("Cargando personajes... 🔄");
+
     const res = await fetch(API_URL);
-    if (!res.ok) throw new Error("Respuesta no OK");
+    if (!res.ok) {
+      throw new Error("Error HTTP: " + res.status);
+    }
 
-    const json = await res.json();
-    
-    const characters = Array.isArray(json) ? json : json.results;
+    const data = await res.json();
 
-    allCharacters = characters || [];
-    displayCharacters(allCharacters);
-  } catch (err) {
-    console.error("Error al cargar personajes:", err);
-    container.innerHTML = `<p class="loading">Error al cargar 😞</p>`;
+   
+    allCharacters = Array.isArray(data.results) ? data.results : [];
+
+    renderCharacters(allCharacters);
+  } catch (error) {
+    console.error(error);
+    showMessage("Error al cargar personajes 😢");
   }
 }
+
 
 
 function searchCharacters() {
-  const text = document.getElementById("search").value.trim().toLowerCase();
+  const input = document.getElementById("searchInput");
+  if (!input) return;
 
-  if (!text) {
-    displayCharacters(allCharacters);
+  const q = input.value.trim().toLowerCase();
+
+  if (!q) {
+    renderCharacters(allCharacters);
     return;
   }
 
-  const filtered = allCharacters.filter((c) =>
-    c.name.toLowerCase().includes(text)
-  );
+  const filtered = allCharacters.filter((c) => {
+    const name = (c.name || "").toLowerCase();
+    const occ = (c.occupation || "").toLowerCase();
+    return name.includes(q) || occ.includes(q);
+  });
 
-  displayCharacters(filtered);
+  renderCharacters(filtered);
 }
-
 
 function showRandomCharacter() {
   if (!allCharacters.length) return;
 
-  const random = allCharacters[Math.floor(Math.random() * allCharacters.length)];
-  displayCharacters([random]);
+  const randomIndex = Math.floor(Math.random() * allCharacters.length);
+  const character = allCharacters[randomIndex];
+  renderCharacters([character]);
+}
+
+function showAllCharacters() {
+  renderCharacters(allCharacters);
 }
 
 
-document.getElementById("btnSearch").onclick = searchCharacters;
-document.getElementById("btnRandom").onclick = showRandomCharacter;
-document.getElementById("btnAll").onclick = () => displayCharacters(allCharacters);
+
+document.addEventListener("DOMContentLoaded", () => {
+ 
+  const btnSearch = document.getElementById("btnSearch");
+  const btnRandom = document.getElementById("btnRandom");
+  const btnAll = document.getElementById("btnAll");
+
+  if (btnSearch) btnSearch.addEventListener("click", searchCharacters);
+  if (btnRandom) btnRandom.addEventListener("click", showRandomCharacter);
+  if (btnAll) btnAll.addEventListener("click", showAllCharacters);
+
+ 
+  const input = document.getElementById("searchInput");
+  if (input) {
+    input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        searchCharacters();
+      }
+    });
+  }
 
 
-document.getElementById("search").addEventListener("keypress", (e) => {
-  if (e.key === "Enter") searchCharacters();
+  loadCharacters();
 });
-
-
-loadAllCharacters();
 
 
