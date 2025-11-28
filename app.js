@@ -85,44 +85,43 @@ async function loadAllCharacters() {
 }
 
 function searchCharacters() {
- const input = document.getElementById("searchInput");
- const text = input.value.trim().toLowerCase();
+    const input = document.getElementById("searchInput");
+    const text = input.value.trim().toLowerCase();
 
-  if (!text) {
-    renderCharacters(allCharacters);
-    return;
-  }
+    if (!text) {
+        renderCharacters(allCharacters);
+        return;
+    }
 
-  const filtered = allCharacters.filter((c) =>
-    c.name.toLowerCase().includes(text)
-  );
+    const filtered = allCharacters.filter((c) =>
+        c.name.toLowerCase().includes(text)
+    );
 
-  renderCharacters(filtered);
+    renderCharacters(filtered);
 }
 
 function showRandom() {
-  if (!allCharacters.length) return;
-  const random =
-    allCharacters[Math.floor(Math.random() * allCharacters.length)];
-  renderCharacters([random]);
+    if (!allCharacters.length) return;
+    const random =
+        allCharacters[Math.floor(Math.random() * allCharacters.length)];
+    renderCharacters([random]);
 }
 
-
 document.addEventListener("DOMContentLoaded", () => {
-  
-  loadAllCharacters();
+    loadAllCharacters();
 
-  document.getElementById("btnSearch").onclick = searchCharacters;
-  document.getElementById("btnRandom").onclick = showRandom;
-  document.getElementById("btnAll").onclick = () =>
-    renderCharacters(allCharacters);
+    document.getElementById("btnSearch").onclick = searchCharacters;
+    document.getElementById("btnRandom").onclick = showRandom;
+    document.getElementById("btnAll").onclick = () =>
+        renderCharacters(allCharacters);
 
-  document
-    .getElementById("search")
-    .addEventListener("keypress", (e) => {
-      if (e.key === "Enter") searchCharacters();
-    });
+    document
+        .getElementById("searchInput")
+        .addEventListener("keypress", (e) => {
+            if (e.key === "Enter") searchCharacters();
+        });
 });
+
 
 
 
